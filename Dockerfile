@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM nvidia/cuda:12.6.0-devel-ubuntu24.04
 WORKDIR /bpftime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -20,7 +20,9 @@ RUN rm -rf build && mkdir build && cmake -Bbuild \
     -DCMAKE_C_COMPILER=/usr/lib/llvm-17/bin/clang \
     -DCMAKE_CXX_COMPILER=/usr/lib/llvm-17/bin/clang++ \
     -DLLVM_CONFIG=/usr/lib/llvm-17/bin/llvm-config \
-    -DLLVM_DIR=/usr/lib/llvm-17/lib/cmake/llvm
+    -DLLVM_DIR=/usr/lib/llvm-17/lib/cmake/llvm \
+    -DBPFTIME_ENABLE_CUDA_ATTACH=1 \
+    -DBPFTIME_CUDA_ROOT=/usr/local/cuda-12.6
 
 RUN cd build && make -j$(nproc)
 RUN cd build && make install
