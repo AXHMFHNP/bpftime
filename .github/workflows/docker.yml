@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build-and-push-image:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     # run only when code is compiling and tests are passing
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     # steps to perform in job
@@ -38,7 +39,7 @@ jobs:
 
       - name: Build image and push to GitHub Container Registry
         uses: docker/build-push-action@v2
-        if: "github.repository_owner == 'eunomia-bpf' && !startsWith(github.ref, 'refs/pull/')"
+        if: "github.repository_owner == 'AXHMFHNP' && !startsWith(github.ref, 'refs/pull/')"
         with:
           # relative path to the place where source code with Dockerfile is located
           context: ./
