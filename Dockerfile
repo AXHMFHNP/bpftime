@@ -11,7 +11,7 @@ RUN apt-get install -y gcc-10 g++-10 || true
 RUN apt-get install -y gcc-11 g++-11 || true
 RUN apt-get install -y gcc-12 g++-12 || true
 
-RUN wget https://developer.download.nvidia.com/compute/cuda/12.6.0/local_installers/cuda_12.6.0_560.28.03_linux.run && \
+RUN wget -q https://developer.download.nvidia.com/compute/cuda/12.6.0/local_installers/cuda_12.6.0_560.28.03_linux.run && \
     sh cuda_12.6.0_560.28.03_linux.run --silent --toolkit --no-opengl-libs && \
     rm -rf cuda_12.6.0_560.28.03_linux.run
 ENV PATH="${PATH}:/usr/local/cuda-12.6/bin"
