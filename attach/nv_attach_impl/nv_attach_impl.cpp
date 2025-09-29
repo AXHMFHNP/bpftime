@@ -8,6 +8,7 @@
 #include "spdlog/spdlog.h"
 #include <asm/unistd.h> // For architecture-specific syscall numbers
 #include <boost/process/detail/child_decl.hpp>
+#include <boost/process/detail/traits/wchar_t.hpp>
 #include <boost/process/env.hpp>
 #include <boost/process/io.hpp>
 #include <boost/process/pipe.hpp>
