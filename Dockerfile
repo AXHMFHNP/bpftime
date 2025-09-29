@@ -5,11 +5,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         lcov tree strace gdb sudo libc6-dev bpftrace \
         linux-headers-generic linux-tools-generic \
         linux-headers-$(uname -r) \
-        libelf-dev procps gnupg gnupg-agent pinentry-curses dirmngr
+        libelf-dev procps gnupg gnupg-agent pinentry-curses dirmngr wget
 
 RUN apt-get install -y gcc-10 g++-10 || true
 RUN apt-get install -y gcc-11 g++-11 || true
 RUN apt-get install -y gcc-12 g++-12 || true
+
+RUN wget https://developer.download.nvidia.com/compute/cuda/12.6.0/local_installers/cuda_12.6.0_560.28.03_linux.run && \
+    sh cuda_12.6.0_560.28.03_linux.run --silent --toolkit --no-opengl-libs && \
+    rm -rf cuda_12.6.0_560.28.03_linux.run
+ENV PATH="${PATH}:/usr/local/cuda-12.6/bin"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/cuda-12.6/lib64"
 
 COPY . .
 
@@ -30,16 +36,16 @@ RUN rm -rf build && mkdir build && cmake -Bbuild \
     -DBPFTIME_LLVM_JIT=1 \
     -DBUILD_BPFTIME_DAEMON=1 \
     -DBUILD_AGENT=1 \
-    -DCMAKE_CXX_FLAGS="-DDEFAULT_LOGGER_OUTPUT_PATH='\"console\"'"
+    -DCMAKE_CXX_FLAGS="-DDEFAULT_LOGGER_OUTPUT_PATH='\"console\"'" \
+    -DBPFTIME_ENABLE_CUDA_ATTACH=1 \
+    -DBPFTIME_CUDA_ROOT=/usr/local/cuda-12.6
     # -DCMAKE_C_COMPILER=/usr/lib/llvm-17/bin/clang \
     # -DCMAKE_CXX_COMPILER=/usr/lib/llvm-17/bin/clang++ \
     # -DLLVM_CONFIG=/usr/lib/llvm-17/bin/llvm-config \
     # -DLLVM_DIR=/usr/lib/llvm-17/lib/cmake/llvm \
-    # -DBPFTIME_ENABLE_CUDA_ATTACH=1 \
-    # -DBPFTIME_CUDA_ROOT=/usr/local/cuda-12.6
 
 # RUN cd build && make -j$(nproc)
 # RUN cd build && make install
 RUN cmake --build build --config RelWithDebInfo -j$(nproc)
-RUN make -C example/malloc
+RUN make -C example/malloc && make -C example/gpu/cuda-counter
 ENV PATH="${PATH}:/root/.bpftime/"
